@@ -1,11 +1,18 @@
 {
   "name": "proto-coverage-reporter",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "main": "lib/index.js",
   "author": "ka-nabellinc <developer.kanabell@gmail.com>",
   "description": "Jest custome reporter for gRPC server E2E testing",
   "license": "MIT",
-  "keywords": ["jest", "grpc", "protobuf", "coverage", "reporter", "E2E"],
+  "keywords": [
+    "jest",
+    "grpc",
+    "protobuf",
+    "coverage",
+    "reporter",
+    "E2E"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ka-nabellinc/proto-coverage-reporter.git"
