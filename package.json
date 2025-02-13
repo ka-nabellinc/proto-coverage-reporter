@@ -1,0 +1,37 @@
+{
+  "name": "proto-coverage-reporter",
+  "version": "0.0.1",
+  "main": "lib/index.js",
+  "author": "andoshin11 <shinglish11@gmail.com>",
+  "description": "Jest custome reporter for gRPC server E2E testing",
+  "license": "MIT",
+  "keywords": ["jest", "grpc", "protobuf", "coverage", "reporter", "E2E"],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ka-nabellinc/proto-coverage-reporter.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ka-nabellinc/proto-coverage-reporter/issues"
+  },
+  "homepage": "https://github.com/ka-nabellinc/proto-coverage-reporter#readme",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "test:type": "tsc --noEmit",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "@jest/reporters": "^29.7.0",
+    "@jest/test-result": "^29.7.0",
+    "@jest/types": "^29.6.3",
+    "@types/node": "^22.13.1",
+    "prettier": "^3.5.0",
+    "typescript": "^5.7.3"
+  },
+  "dependencies": {
+    "@grpc/grpc-js": "^1.12.6",
+    "chalk": "4.1.2",
+    "cli-table": "^0.3.11",
+    "protobufjs": "7.2.5"
+  }
+}
