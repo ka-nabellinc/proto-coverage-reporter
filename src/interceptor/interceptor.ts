@@ -1,10 +1,6 @@
-import * as fs from 'fs';
-import * as path from 'path';
 import { type Interceptor, InterceptingCall, ListenerBuilder } from '@grpc/grpc-js';
 import type { IInterceptLog } from '../types';
-import { logsDirPath } from '../const';
-
-const generateRandomString = () => `${Date.now()}${Math.random()}`;
+import { writeLog } from '../logs'
 
 export const protoCoverageInterceptor: Interceptor = (options, nextCall) =>
   new InterceptingCall(nextCall(options), {
@@ -29,8 +25,7 @@ export const protoCoverageInterceptor: Interceptor = (options, nextCall) =>
           timestamp: Date.now(),
         };
 
-        const fileName = generateRandomString();
-        fs.writeFileSync(path.resolve(logsDirPath, `${fileName}.json`), JSON.stringify(log));
+        writeLog(log)
         next(status);
       });
 
