@@ -36,11 +36,11 @@ jobs:
           yarn run build
       - name: Publish
         run: |
-          echo _auth=$NPM_AUTOMATION_TOKEN >> .npmrc
+          echo //registry.npmjs.org/:_auth=$NPM_AUTOMATION_TOKEN >> .npmrc
           npx can-npm-publish --verbose && npm publish || echo "Does not publish"
         env:
           NPM_AUTOMATION_TOKEN: ${{ secrets.NPM_AUTOMATION_TOKEN }}
       - name: Push
         run: |
-          git push origin master
+          git push origin main
           git push origin v${{ github.event.inputs.release_version }}
