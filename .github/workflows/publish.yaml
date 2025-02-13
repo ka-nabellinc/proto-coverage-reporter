@@ -1,0 +1,46 @@
+name: Publish to npm
+on:
+  workflow_dispatch:
+    inputs:
+      release_version:
+        description: 'Release Tag version (ex: 1.0.1)'
+        required: true
+
+env:
+  NODE_ENV: production
+
+jobs:
+  deploy:
+    name: Build & Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Use Node.js v22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'yarn'
+      - name: Install dependencies
+        run: yarn install --pure-lockfile --production=false
+      - name: Update Tag
+        run: |
+          git remote set-url origin https://github-actions:${{secrets.GITHUB_TOKEN}}@github.com/$GITHUB_REPOSITORY
+          git config --global user.name "$GITHUB_ACTOR"
+          git config --global user.email "$GITHUB_ACTOR@users.noreply.github.com"
+          npm version ${{ github.event.inputs.release_version }}
+      - name: Build
+        run: |
+          yarn run build
+      - name: Publish
+        run: |
+          echo _auth=$NPM_AUTOMATION_TOKEN >> .npmrc
+          npx can-npm-publish --verbose && npm publish || echo "Does not publish"
+        env:
+          NPM_AUTOMATION_TOKEN: ${{ secrets.NPM_AUTOMATION_TOKEN }}
+      - name: Push
+        run: |
+          git push origin master
+          git push origin v${{ github.event.inputs.release_version }}
