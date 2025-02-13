@@ -37,7 +37,7 @@ jobs:
       - name: Publish
         run: |
           echo //registry.npmjs.org/:_auth=$NPM_AUTOMATION_TOKEN >> .npmrc
-          npx can-npm-publish --verbose && npm publish || echo "Does not publish"
+          npm publish
         env:
           NPM_AUTOMATION_TOKEN: ${{ secrets.NPM_AUTOMATION_TOKEN }}
       - name: Push
