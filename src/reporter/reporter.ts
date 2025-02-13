@@ -4,6 +4,7 @@ import type { Config } from '@jest/types';
 import type { Reporter } from '@jest/reporters';
 import type { TestContext } from '@jest/test-result';
 import type { AggregatedResult } from '@jest/test-result';
+import { context, getOctokit } from '@actions/github'
 import { logsDirPath, Status } from '../const';
 import { readLogsMap } from '../logs';
 import { parseMethodSpec } from './proto';
@@ -49,6 +50,7 @@ export default class ProtoCoverageReporter implements Reporter {
     const logsMap = await readLogsMap();
     const parsed = this.parseResult(logsMap);
     this.stdoutCoverage(parsed);
+    this.createComment(parsed)
 
     this.removeLogsDir();
   }
@@ -102,6 +104,27 @@ export default class ProtoCoverageReporter implements Reporter {
     }
 
     console.log(table.toString());
+  }
+
+  async createComment(result: ICoverageResult) {
+    console.log('inside createComment')
+    console.log('hasContext', !!context)
+    console.log('eventName', context.eventName)
+    console.log('pr', context.payload.pull_request)
+    console.log('pr num', context.payload.pull_request?.number)
+    console.log('GITHUB_TOKEN', process.env.GITHUB_TOKEN)
+
+    const octokit = getOctokit(process.env.GITHUB_TOKEN!)
+
+    if (context.payload.pull_request?.number) {
+      console.log('creating comment')
+
+      await octokit.rest.issues.createComment({
+        ...context.repo,
+        issue_number: context.payload.pull_request.number as number,
+        body: 'test comment'
+      })
+    }
   }
 
   getServiceProtoAbsolutePath(serviceProtoPath: string) {

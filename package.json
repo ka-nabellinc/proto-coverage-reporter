@@ -36,6 +36,7 @@
     "typescript": "^5.7.3"
   },
   "dependencies": {
+    "@actions/github": "^6.0.0",
     "@grpc/grpc-js": "^1.12.6",
     "chalk": "4.1.2",
     "cli-table": "^0.3.11",
