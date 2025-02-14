@@ -110,9 +110,12 @@ export default class ProtoCoverageReporter implements Reporter {
     console.log('inside createComment')
     console.log('hasContext', !!context)
     console.log('eventName', context.eventName)
+    console.log('payload', context.payload)
+    console.log('issue', context.issue)
     console.log('pr', context.payload.pull_request)
     console.log('pr num', context.payload.pull_request?.number)
     console.log('GITHUB_TOKEN', process.env.GITHUB_TOKEN)
+    console.log(context)
 
     const octokit = getOctokit(process.env.GITHUB_TOKEN!)
 
