@@ -23,6 +23,7 @@ jobs:
         with:
           node-version: '22'
           cache: 'yarn'
+          registry-url: 'https://registry.npmjs.org'
       - name: Install dependencies
         run: yarn install --pure-lockfile --production=false
       - name: Update Tag
@@ -36,7 +37,7 @@ jobs:
           yarn run build
       - name: Publish
         run: |
-          npm publish --provenance --access public
+          npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTOMATION_TOKEN }}
       - name: Push
