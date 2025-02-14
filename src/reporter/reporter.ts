@@ -107,10 +107,11 @@ export default class ProtoCoverageReporter implements Reporter {
   }
 
   async createComment(result: ICoverageResult) {
+    const { eventName } = context
+    console.log('eventName', eventName)
+    if (!eventName || eventName !== 'push') return
+
     console.log('inside createComment')
-    console.log('hasContext', !!context)
-    console.log('eventName', context.eventName)
-    console.log('payload', context.payload)
     console.log('issue', context.issue)
     console.log('pr', context.payload.pull_request)
     console.log('pr num', context.payload.pull_request?.number)
@@ -118,8 +119,6 @@ export default class ProtoCoverageReporter implements Reporter {
     console.log(context)
     console.log('//////////checking env ///////////')
     console.log(process.env)
-    console.log('GITHUB_ACTION', process.env.GITHUB_ACTION)
-    console.log('GITHUB_EVENT_NAME', process.env.GITHUB_EVENT_NAME)
 
     const octokit = getOctokit(process.env.GITHUB_TOKEN!)
 
@@ -129,7 +128,8 @@ export default class ProtoCoverageReporter implements Reporter {
       state: 'open',
     })
 
-    console.log('issues', issues)
+    const prs = issues.data.map(i => i.pull_request).filter(Boolean)
+    console.log('prs', prs)
   }
 
   getServiceProtoAbsolutePath(serviceProtoPath: string) {
