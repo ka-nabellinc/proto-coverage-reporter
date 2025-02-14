@@ -36,10 +36,9 @@ jobs:
           yarn run build
       - name: Publish
         run: |
-          echo //registry.npmjs.org/:_auth=$NPM_AUTOMATION_TOKEN >> .npmrc
-          npm publish
+          npm publish --provenance --access public
         env:
-          NPM_AUTOMATION_TOKEN: ${{ secrets.NPM_AUTOMATION_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTOMATION_TOKEN }}
       - name: Push
         run: |
           git push origin main
