@@ -116,18 +116,20 @@ export default class ProtoCoverageReporter implements Reporter {
     console.log('pr num', context.payload.pull_request?.number)
     console.log('GITHUB_TOKEN', process.env.GITHUB_TOKEN)
     console.log(context)
+    console.log('//////////checking env ///////////')
+    console.log(process.env)
+    console.log('GITHUB_ACTION', process.env.GITHUB_ACTION)
+    console.log('GITHUB_EVENT_NAME', process.env.GITHUB_EVENT_NAME)
 
     const octokit = getOctokit(process.env.GITHUB_TOKEN!)
 
-    if (context.payload.pull_request?.number) {
-      console.log('creating comment')
+    const issues = await octokit.rest.issues.listForRepo({
+      owner: context.repo.owner,
+      repo: context.repo.repo,
+      state: 'open',
+    })
 
-      await octokit.rest.issues.createComment({
-        ...context.repo,
-        issue_number: context.payload.pull_request.number as number,
-        body: 'test comment'
-      })
-    }
+    console.log('issues', issues)
   }
 
   getServiceProtoAbsolutePath(serviceProtoPath: string) {
