@@ -1,5 +1,7 @@
 # proto-coverage-reporter
 
+![NPM Version](https://img.shields.io/npm/v/proto-coverage-reporter)
+
 Protobuf method call coverage reporter for gRPC Server E2E testing.
 Works along with [Jest](https://jestjs.io/).
 
