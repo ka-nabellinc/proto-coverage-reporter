@@ -118,8 +118,27 @@ export default class ProtoCoverageReporter implements Reporter {
         owner,
         repo,
         head: sha,
+        state: 'open',
       })
       if (!prs || !prs.length) return
+      const targetPr = prs.find(pr => pr.head.sha === sha)
+      if (!targetPr) return
+      const { number: issue_number } = targetPr
+
+      // remove existing comment
+      const { data: comments } = await octokit.rest.issues.listComments({
+        owner,
+        repo,
+        issue_number
+      })
+      const targetComment = comments.find(comment => comment.body?.includes('__Proto_Coverage_Result__'))
+      if (targetComment) {
+        await octokit.rest.issues.deleteComment({
+          owner,
+          repo,
+          comment_id: targetComment.id
+        })
+      }
 
       const coverages: number[] = []
       const formattedLogs: string[] = []
@@ -134,35 +153,22 @@ export default class ProtoCoverageReporter implements Reporter {
 
       const totalCoverage = Math.round(coverages.reduce((acc, cur) => acc + cur, 0) / coverages.length)
 
-      await Promise.all(prs.map(async pr => {
-        const { number: issue_number } = pr
-
-        await octokit.rest.issues.createComment({
-          owner,
-          repo,
-          issue_number,
-          body: `
-![__Proto Coverage Result__](https://img.shields.io/badge/Proto_Coverage-${totalCoverage}%25-${totalCoverage === 100 ? 'brightgreen' : 'red'})
+      await octokit.rest.issues.createComment({
+        owner,
+        repo,
+        issue_number,
+        body: `
+![__Proto_Coverage_Result__](https://img.shields.io/badge/Proto_Coverage-${totalCoverage}%25-${totalCoverage === 100 ? 'brightgreen' : 'red'})
 
 <details open>
-  <summary>Coverage Report</summary>
+<summary>Coverage Report</summary>
 
 | Package | Method | Coverage | Unchecked Status |
 | --- | --- | --- | --- |
 ${formattedLogs.join('\n')}
 </details>
-          `.trim()
-        })
-      }))
-
-      console.log(`spotting target PR....`)
-      console.log('head commit', context.payload.head_commit.id)
-      const targetPr = await octokit.rest.pulls.list({
-        owner,
-        repo,
-        head: context.payload.head_commit.id,
+        `.trim()
       })
-      console.log('target PR', targetPr.data)
     } catch (e) {
       console.error(e)
       console.error('Failed to create PR comment')
