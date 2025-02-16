@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import { Root } from 'protobufjs';
 import type { IMethodSpec } from '../types';
 
-const OPTION_IDENTIFIER = '(tcg_platform.grpc.v1.spec)';
+const OPTION_IDENTIFIER = '(ka_nabellinc.grpc_spec.spec)';
 
 export function parseMethodSpec(serviceProtoAbsolutePath: string, packageName: string) {
   if (!fs.existsSync(serviceProtoAbsolutePath)) {
