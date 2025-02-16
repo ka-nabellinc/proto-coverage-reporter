@@ -14,18 +14,18 @@ yarn add -D proto-coverage-reporter # yarn
 
 ## Prerequisites
 
-Use extension.proto(TBD) to specify method options for your service.
+Use [extension.proto](https://github.com/ka-nabellinc/grpc-spec/blob/main/extension.proto) to specify method options for your service.
 
 ```proto
 syntax = "proto3";
 
 package tutorial;
 
-import "tcg_platform/grpc/v1/extension.proto";
+import "ka_nabellinc/grpc_spec/extension.proto";
 
 service HelloService {
   rpc Greet(GreetRequest) returns (GreetResponse) {
-    option (tcg_platform.grpc.v1.spec) = {
+    option (ka_nabellinc.grpc_spec.spec) = {
       status_codes: ["OK", "INVALID_ARGUMENTS", "ALREADY_EXISTS", "PERMISSION_DENIED"]
     };
   }
