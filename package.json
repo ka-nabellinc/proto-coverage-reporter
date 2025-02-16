@@ -1,6 +1,6 @@
 {
   "name": "proto-coverage-reporter",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "main": "lib/index.js",
   "author": "ka-nabellinc <developer.kanabell@gmail.com>",
   "description": "Jest custome reporter for gRPC server E2E testing",
