@@ -50,7 +50,7 @@ export default class ProtoCoverageReporter implements Reporter {
     const logsMap = await readLogsMap();
     const parsed = this.parseResult(logsMap);
     this.stdoutCoverage(parsed);
-    this.createComment(parsed)
+    this.createPRComment(parsed)
 
     this.removeLogsDir();
   }
@@ -106,30 +106,59 @@ export default class ProtoCoverageReporter implements Reporter {
     console.log(table.toString());
   }
 
-  async createComment(result: ICoverageResult) {
-    const { eventName } = context
-    console.log('eventName', eventName)
-    if (!eventName || eventName !== 'push') return
+  async createPRComment(result: ICoverageResult) {
+    try {
+      if (typeof process.env.GITHUB_TOKEN !== 'string' || !process.env.GITHUB_TOKEN) return
+      const { eventName, repo: { owner, repo }, sha } = context
+      console.log('eventName', eventName)
+      if (!eventName || eventName !== 'push') return
 
-    console.log(context)
-    console.log('//////////checking env ///////////')
-    console.log(process.env)
+      const octokit = getOctokit(process.env.GITHUB_TOKEN!)
+      const { data: prs } = await octokit.rest.pulls.list({
+        owner,
+        repo,
+        head: sha,
+      })
+      if (!prs || !prs.length) return
 
-    const octokit = getOctokit(process.env.GITHUB_TOKEN!)
+      const coverages: number[] = []
+      const formattedLogs: string[] = []
 
-    const pullRequests = await octokit.rest.pulls.list({
-      owner: context.repo.owner,
-      repo: context.repo.repo,
-      state: 'open',
-    })
-    console.log('pullRequests', pullRequests)
+      for (const [packageName, methods] of Object.entries(result)) {
+        for (const [methodName, { status_codes }] of Object.entries(methods)) {
+          const { coverage, unchecked } = status_codes;
+          coverages.push(coverage)
+          formattedLogs.push(`| ${packageName} | ${methodName} | ${coverage}% | ${unchecked.join(', ')} |`)
+        }
+      }
 
-    const prByHead = await octokit.rest.pulls.list({
-      owner: context.repo.owner,
-      repo: context.repo.repo,
-      head: context.sha,
-    })
-    console.log('prByHead', prByHead)
+      const totalCoverage = Math.round(coverages.reduce((acc, cur) => acc + cur, 0) / coverages.length)
+
+      await Promise.all(prs.map(async pr => {
+        const { number: issue_number } = pr
+
+        await octokit.rest.issues.createComment({
+          owner,
+          repo,
+          issue_number,
+          body: `
+![Proto Coverage Result](https://img.shields.io/badge/Proto_Coverage-${totalCoverage}%25-${totalCoverage === 100 ? 'brightgreen' : 'red'})
+
+<details open>
+  <summary>Coverage Report</summary>
+
+| Package | Method | Coverage | Unchecked Status |
+| --- | --- | --- | --- |
+${formattedLogs.join('\n')}
+</details>
+          `.trim()
+        })
+      }))
+
+    } catch (e) {
+      console.error(e)
+      console.error('Failed to create PR comment')
+    }
   }
 
   getServiceProtoAbsolutePath(serviceProtoPath: string) {
