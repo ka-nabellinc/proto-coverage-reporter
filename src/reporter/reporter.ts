@@ -108,10 +108,10 @@ export default class ProtoCoverageReporter implements Reporter {
 
   async createPRComment(result: ICoverageResult) {
     try {
-      if (typeof process.env.GITHUB_TOKEN !== 'string' || !process.env.GITHUB_TOKEN) return
+      if (process.env.CI !== 'true' || typeof process.env.GITHUB_TOKEN !== 'string' || !process.env.GITHUB_TOKEN) return
       const { eventName, repo: { owner, repo }, sha } = context
       console.log('eventName', eventName)
-      if (!eventName || eventName !== 'push') return
+      if (!eventName || !['push'].includes(eventName)) return
 
       const octokit = getOctokit(process.env.GITHUB_TOKEN!)
       const { data: prs } = await octokit.rest.pulls.list({
