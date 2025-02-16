@@ -142,7 +142,7 @@ export default class ProtoCoverageReporter implements Reporter {
           repo,
           issue_number,
           body: `
-![Proto Coverage Result](https://img.shields.io/badge/Proto_Coverage-${totalCoverage}%25-${totalCoverage === 100 ? 'brightgreen' : 'red'})
+![__Proto Coverage Result__](https://img.shields.io/badge/Proto_Coverage-${totalCoverage}%25-${totalCoverage === 100 ? 'brightgreen' : 'red'})
 
 <details open>
   <summary>Coverage Report</summary>
@@ -155,6 +155,14 @@ ${formattedLogs.join('\n')}
         })
       }))
 
+      console.log(`spotting target PR....`)
+      console.log('head commit', context.payload.head_commit.id)
+      const targetPr = await octokit.rest.pulls.list({
+        owner,
+        repo,
+        head: context.payload.head_commit.id,
+      })
+      console.log('target PR', targetPr.data)
     } catch (e) {
       console.error(e)
       console.error('Failed to create PR comment')
